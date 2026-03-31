@@ -2,7 +2,7 @@ import express from 'express';
 import 'dotenv/config';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
-
+import moduleRoutes from './routes/moduleRoutes.js';
 
 connectDB();
 
@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: false }));
 
 
 app.use('/api/users', userRoutes);
+app.use('/api/modules', moduleRoutes);
 
 
 app.use((err, req, res, next) => {
