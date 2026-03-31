@@ -32,3 +32,43 @@ export const getModuleById = asyncHandler(async(req,res)=>{
         throw new Error("Module not found");
     }
 })
+
+export const updateModule = asyncHandler(async(req,res)=>{
+    const module = await Module.findById(req.params.id);
+
+    if(!module){
+        res.status(404);
+        throw new Error('Module not found');
+    }
+
+    if(module.educator.toString() !== req.user.id){
+        res.status(401);
+        throw new Error('User not authorized to update this module');
+    }
+
+    const updatedModule = await Module.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true, runValidators: true }
+    );
+
+    res.status(200).json(updatedModule);
+});
+
+export const deleteModule = asyncHandler(async(req,res)=>{
+    const module = await Module.findById(req.params.id);
+
+    if(!module){
+        res.status(404);
+        throw new Error('Module not found');
+    }
+
+    if(module.educator.toString() !== req.user.id){
+        res.status(401);
+        throw new Error('User not authorized to update this module');
+    }
+
+    await module.deleteOne();
+
+    res.status(200).json({ id: req.params.id, message: 'Module deleted successfully' });
+})
