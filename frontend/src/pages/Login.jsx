@@ -25,7 +25,7 @@ const Login = () => {
     <div className="flex items-center justify-center min-h-[80vh]">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-blue-600">SlidesManager</h1>
+          <h1 className="text-3xl font-bold text-blue-600">EduSync</h1>
           <p className="mt-2 text-gray-600">Sign in to your account</p>
         </div>
 

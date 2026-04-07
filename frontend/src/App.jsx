@@ -1,14 +1,31 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+// Import Components and Pages
+import Navbar from './components/Navbar';
+import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <main className="container mx-auto px-4 py-8">
-        <Login /> 
-      </main>
-    </div>
+    <BrowserRouter>
+      <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
+        {/* Navbar sits outside the Routes so it shows on every page */}
+        <Navbar />
+        
+        <main className="container mx-auto px-4 py-8">
+          <Routes>
+            {/* The root URL '/' will show the Dashboard */}
+            <Route path="/" element={<Dashboard />} />
+            
+            {/* Auth Routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
   );
 }
 
