@@ -8,19 +8,25 @@ const Register = () => {
     role: 'Student', // Default role
   });
 
+  const [error, setError] = useState('');
+
   const { name, email, password, role } = formData;
 
-  const onChange = (e) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  const navigate = useNavigate(); 
+  const { register } = useAuth();
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    console.log('Register Form Submitted:', formData);
-    // API call will go here
+    setError(''); 
+
+    
+    const result = await register({ name, email, password, role });
+
+    if (result.success) {
+      navigate('/'); 
+    } else {
+      setError(result.message); 
+    }
   };
 
   return (

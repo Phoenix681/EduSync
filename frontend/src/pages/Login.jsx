@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +10,11 @@ const Login = () => {
 
   const { email, password } = formData;
 
+  const [error, setError] = useState('');
+
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
   const onChange = (e) => {
     setFormData((prevState) => ({
       ...prevState,
@@ -15,10 +22,17 @@ const Login = () => {
     }));
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login Form Submitted:', formData);
-    // API call will go here
+    setError(''); 
+    
+    const result = await login({ email, password });
+    
+    if (result.success) {
+      navigate('/');
+    } else {
+      setError(result.message);
+    }
   };
 
   return (
