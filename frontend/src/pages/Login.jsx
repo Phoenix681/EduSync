@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -9,8 +10,6 @@ const Login = () => {
   });
 
   const { email, password } = formData;
-
-  const [error, setError] = useState('');
 
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -24,14 +23,14 @@ const Login = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    setError(''); 
     
     const result = await login({ email, password });
     
     if (result.success) {
+      toast.success('Welcome back!');
       navigate('/');
     } else {
-      setError(result.message);
+      toast.error(result.message);
     }
   };
 

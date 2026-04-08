@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -8,24 +11,29 @@ const Register = () => {
     role: 'Student', // Default role
   });
 
-  const [error, setError] = useState('');
-
   const { name, email, password, role } = formData;
 
   const navigate = useNavigate(); 
   const { register } = useAuth();
 
+  const onChange = (e) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
-    setError(''); 
 
     
     const result = await register({ name, email, password, role });
 
     if (result.success) {
+      toast.success('Registration Successful');
       navigate('/'); 
     } else {
-      setError(result.message); 
+      toast.error(result.message);
     }
   };
 
