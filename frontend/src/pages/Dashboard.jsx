@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const [modules, setModules] = useState([]);
@@ -84,9 +84,12 @@ const Dashboard = () => {
                   {module.description}
                 </p>
               </div>
-              <button className="w-full px-4 py-2 mt-4 text-sm font-medium text-blue-600 transition-colors border border-blue-600 rounded-md hover:bg-blue-50">
+              <Link 
+                to={`/module/${module._id}`}
+                className="block w-full px-4 py-2 mt-4 text-sm font-medium text-center text-blue-600 transition-colors border border-blue-600 rounded-md hover:bg-blue-50"
+              >
                 View Module
-              </button>
+              </Link>
             </div>
           ))}
         </div>
