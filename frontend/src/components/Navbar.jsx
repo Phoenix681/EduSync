@@ -33,8 +33,8 @@ const Navbar = () => {
               {/* Only show 'Create Module' if the user is an Educator */}
               {user.role === 'Educator' && (
                 <li>
-                  <Link to="/create-module" className="text-gray-600 hover:text-blue-600 font-medium">
-                    Create Module
+                  <Link to="/my-modules" className="text-gray-600 hover:text-blue-600 font-medium">
+                    My Modules
                   </Link>
                 </li>
               )}

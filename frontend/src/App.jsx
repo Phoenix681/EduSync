@@ -11,6 +11,8 @@ import ViewModule from './pages/ViewModule';
 import Chat from './pages/Chat';
 import Inbox from './pages/Inbox';
 import CreateModule from './pages/CreateModule';
+import MyModules from './pages/MyModules';
+import EditModule from './pages/EditModule';
 
 function App() {
   return (
@@ -33,6 +35,8 @@ function App() {
             <Route path="/chat/:targetUserId" element={<Chat />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/create-module" element={<CreateModule />} />
+            <Route path="/my-modules" element={<MyModules />} />
+            <Route path="/edit-module/:id" element={<EditModule />} />
           </Routes>
         </main>
       </div>
