@@ -25,14 +25,26 @@ const Navbar = () => {
           {/* 3. Conditional Rendering: If logged in, show Name & Logout. If not, show Login/Register */}
           {user ? (
             <>
-              <li className="hidden md:block text-sm font-medium text-gray-700">
-                Hi, {user.name.split(' ')[0]} {/* Grabs just their first name */}
+              {/* NEW: Navigation Links */}
+              <li>
+                <Link to="/inbox" className="text-gray-600 hover:text-blue-600">Messages</Link>
+              </li>
+              
+              {/* Only show 'Create Module' if the user is an Educator */}
+              {user.role === 'Educator' && (
+                <li>
+                  <Link to="/create-module" className="text-gray-600 hover:text-blue-600 font-medium">
+                    Create Module
+                  </Link>
+                </li>
+              )}
+
+              {/* Existing Profile & Logout */}
+              <li className="hidden md:block text-sm font-medium text-gray-700 ml-4 border-l pl-4">
+                Hi, {user.name.split(' ')[0]}
               </li>
               <li>
-                <button
-                  onClick={handleLogout}
-                  className="px-4 py-2 text-sm font-medium text-red-600 transition-colors border border-red-600 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500"
-                >
+                <button onClick={handleLogout} className="px-4 py-2 text-sm font-medium text-red-600 transition-colors border border-red-600 rounded-md hover:bg-red-50">
                   Logout
                 </button>
               </li>

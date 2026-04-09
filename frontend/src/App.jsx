@@ -8,6 +8,9 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ViewModule from './pages/ViewModule';
+import Chat from './pages/Chat';
+import Inbox from './pages/Inbox';
+import CreateModule from './pages/CreateModule';
 
 function App() {
   return (
@@ -27,6 +30,9 @@ function App() {
             <Route path="/module/:id" element={<ViewModule />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/chat/:targetUserId" element={<Chat />} />
+            <Route path="/inbox" element={<Inbox />} />
+            <Route path="/create-module" element={<CreateModule />} />
           </Routes>
         </main>
       </div>

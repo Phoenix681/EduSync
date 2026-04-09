@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
+import Message from '../models/messageModel.js';
 
 
 export const registerUser = asyncHandler(async(req,res)=>{
@@ -54,4 +55,23 @@ export const loginUser = asyncHandler(async (req, res) => {
 
 export const getMe = asyncHandler(async (req, res) => {
   res.status(200).json(req.user);
+});
+
+export const getContacts = asyncHandler(async (req, res) => {
+  // 1. Find all messages where the logged-in user is either the sender or receiver
+  const messages = await Message.find({
+    $or: [{ sender: req.user._id }, { receiver: req.user._id }]
+  });
+
+  // 2. Extract unique user IDs from those messages (excluding the logged-in user)
+  const contactIds = [...new Set(messages.map(msg => {
+    return msg.sender.toString() === req.user._id.toString() 
+      ? msg.receiver.toString() 
+      : msg.sender.toString();
+  }))];
+
+  // 3. Fetch the full user profiles for those specific IDs
+  const contacts = await User.find({ _id: { $in: contactIds } }).select('-password');
+
+  res.json(contacts);
 });

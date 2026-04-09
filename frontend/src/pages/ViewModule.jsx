@@ -51,8 +51,22 @@ const ViewModule = () => {
       {/* Top Header */}
       <div className="mb-6">
         <Link to="/" className="text-sm text-blue-600 hover:underline">&larr; Back to Dashboard</Link>
-        <h1 className="mt-4 text-3xl font-bold text-gray-800">{module.title}</h1>
-        <p className="text-gray-600">By {module.educator.name}</p>
+        <div className="flex items-center justify-between mt-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">{module.title}</h1>
+            <p className="text-gray-600">By {module.educator.name}</p>
+          </div>
+          
+          {/* NEW: Chat Button. Only show it if the logged-in user IS NOT the educator */}
+          {user._id !== module.educator._id && (
+            <Link 
+              to={`/chat/${module.educator._id}`}
+              className="px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700"
+            >
+              Message Educator
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* The Slide Viewer */}
