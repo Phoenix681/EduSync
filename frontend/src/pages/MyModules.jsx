@@ -10,6 +10,8 @@ const MyModules = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const [moduleToDelete, setModuleToDelete] = useState(null);
+
   useEffect(() => {
     // Security check: Only Educators belong here
     if (!user || user.role !== 'Educator') {
@@ -36,20 +38,25 @@ const MyModules = () => {
     fetchMyModules();
   }, [user, navigate]);
 
-  const handleDelete = async (id) => {
-    // Always double-check before deleting data!
-    if (window.confirm('Are you absolutely sure you want to delete this module? This cannot be undone.')) {
-      try {
-        const config = { headers: { Authorization: `Bearer ${user.token}` } };
-        await axios.delete(`/api/modules/${id}`, config);
-        
-        // Remove it from the screen immediately without reloading the page
-        setModules(modules.filter((module) => module._id !== id));
-        toast.success('Module deleted successfully');
-      } catch (error) {
-        toast.error(error.response?.data?.message || 'Failed to delete module');
-      }
+  const confirmDelete = async () => {
+    if (!moduleToDelete) return;
+    try {
+      const config = { headers: { Authorization: `Bearer ${user.token}` } };
+      await axios.delete(`/api/modules/${moduleToDelete}`, config);
+      
+      // Remove it from the screen immediately without reloading the page
+      setModules(modules.filter((module) => module._id !== moduleToDelete));
+      toast.success('Module deleted successfully');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete module');
+    } finally {
+      setModuleToDelete(null);
     }
+  };
+
+  const handleDeleteClick = (id) => {
+    // Open the confirmation modal instead of using window.confirm
+    setModuleToDelete(id);
   };
 
   if (loading) return <div className="mt-20 text-center text-gray-500">Loading your content...</div>;
@@ -86,7 +93,7 @@ const MyModules = () => {
                     Edit
                   </Link>
                   <button 
-                    onClick={() => handleDelete(module._id)}
+                    onClick={() => handleDeleteClick(module._id)}
                     className="text-sm font-medium text-red-600 hover:text-red-800 hover:underline"
                   >
                     Delete
@@ -99,6 +106,32 @@ const MyModules = () => {
               </p>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Custom Confirmation Modal */}
+      {moduleToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-xl">
+            <h2 className="mb-4 text-xl font-bold text-gray-800">Delete Module</h2>
+            <p className="mb-6 text-gray-600">
+              Are you absolutely sure you want to delete this module? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setModuleToDelete(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

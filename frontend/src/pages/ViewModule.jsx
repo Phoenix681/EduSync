@@ -5,12 +5,12 @@ import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
 
 const ViewModule = () => {
-  const { id } = useParams(); // 1. Grab the module ID from the URL (e.g., /module/12345)
+  const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   
   const [module, setModule] = useState(null);
-  const [activeSlide, setActiveSlide] = useState(0); // 2. Track which slide we are looking at
+  const [activeSlide, setActiveSlide] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ const ViewModule = () => {
         setLoading(false);
       } catch {
         toast.error('Failed to load module');
-        navigate('/'); // Send them back if it fails
+        navigate('/');
       }
     };
 
@@ -38,7 +38,6 @@ const ViewModule = () => {
     return <div className="mt-20 text-xl text-center text-gray-500">Loading presentation...</div>;
   }
 
-  // Helper functions for the Next/Prev buttons
   const nextSlide = () => {
     if (activeSlide < module.slides.length - 1) setActiveSlide(activeSlide + 1);
   };
@@ -57,7 +56,6 @@ const ViewModule = () => {
             <p className="text-gray-600">By {module.educator.name}</p>
           </div>
           
-          {/* NEW: Chat Button. Only show it if the logged-in user IS NOT the educator */}
           {user._id !== module.educator._id && (
             <Link 
               to={`/chat/${module.educator._id}`}
@@ -88,6 +86,21 @@ const ViewModule = () => {
             <p className="text-lg leading-relaxed text-gray-700 whitespace-pre-wrap">
               {module.slides[activeSlide].content}
             </p>
+
+            {/* ========================================== */}
+            {/* NEW: RENDER THE CLOUDINARY IMAGE HERE!     */}
+            {/* ========================================== */}
+            {module.slides[activeSlide].image && (
+              <div className="mt-8 flex justify-center">
+                <img 
+                  src={module.slides[activeSlide].image} 
+                  alt={module.slides[activeSlide].title} 
+                  className="max-w-full max-h-[500px] object-contain rounded-lg shadow-md border border-gray-100"
+                />
+              </div>
+            )}
+            {/* ========================================== */}
+
           </div>
 
           {/* Navigation Controls */}

@@ -5,6 +5,7 @@ import userRoutes from './routes/userRoutes.js';
 import moduleRoutes from './routes/moduleRoutes.js';
 import messageRoutes from "./routes/messageRoutes.js";
 import Message from "./models/messageModel.js";
+import uploadRoutes from './routes/uploadRoutes.js';
 
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -30,6 +31,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/api/users', userRoutes);
 app.use('/api/modules', moduleRoutes);
 app.use('/api/messages', messageRoutes);
+
+app.use('/api/upload', uploadRoutes);
 
 io.on('connection', (socket) => {
   console.log(`User Connected to Socket: ${socket.id}`);
