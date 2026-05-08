@@ -35,32 +35,34 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[80vh]">
-      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-blue-600">EduSync</h1>
-          <p className="mt-2 text-gray-600">Sign in to your account</p>
+    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 p-4 sm:p-6 lg:p-8">
+      <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 text-white pt-12 pb-24 px-4 sm:px-6 lg:px-8 shadow-inner"></div>
+      
+      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl shadow-2xl z-10">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
+          <p className="mt-2 text-gray-600">Sign in to continue to EduSync</p>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email Address</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
             <input
               type="email"
               name="email"
               value={email}
               onChange={onChange}
               required
-              className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 text-gray-800 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
               placeholder="you@example.com"
             />
           </div>
 
           <div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-1">
               <label className="block text-sm font-medium text-gray-700">Password</label>
               <Link to="/forgot-password"
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-indigo-600 hover:underline"
               >
                 Forgot Password?
               </Link>
@@ -71,14 +73,14 @@ const Login = () => {
               value={password}
               onChange={onChange}
               required
-              className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 text-gray-800 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
               placeholder="••••••••"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+            className="w-full flex justify-center items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5"
           >
             Sign In
           </button>
@@ -86,7 +88,7 @@ const Login = () => {
 
         <p className="mt-6 text-sm text-center text-gray-600">
           Don't have an account?{' '}
-          <Link to="/register" className="font-medium text-blue-600 cursor-pointer hover:underline">
+          <Link to="/register" className="font-medium text-indigo-600 cursor-pointer hover:underline">
             Register here
           </Link>
         </p>

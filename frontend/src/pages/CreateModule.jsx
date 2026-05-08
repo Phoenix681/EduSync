@@ -82,91 +82,141 @@ const CreateModule = () => {
   };
 
   if (user?.role !== 'Educator') {
-    return <div className="mt-20 text-xl text-center text-red-600">Access Denied. Educators only.</div>;
+    // This can be a more elaborate "Access Denied" component later
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="p-12 bg-white rounded-2xl shadow-lg text-center">
+          <h2 className="text-2xl font-bold text-red-600">Access Denied</h2>
+          <p className="mt-2 text-gray-600">Only users with the 'Educator' role can create modules.</p>
+          <button onClick={() => navigate('/')} className="mt-6 px-6 py-2 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-all">
+            Return to Dashboard
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-3xl mx-auto mt-8">
-      <h1 className="mb-6 text-3xl font-bold text-gray-800">Create New Module</h1>
-      
-      <form onSubmit={handleSubmit} className="p-8 bg-white border border-gray-200 rounded-lg shadow-sm">
-        {/* Module Metadata */}
-        <div className="space-y-4 mb-8">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Module Title</label>
-            <input type="text" required value={title} onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md focus:ring-blue-500" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Description</label>
-            <textarea required value={description} onChange={(e) => setDescription(e.target.value)} rows="2"
-              className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md focus:ring-blue-500" />
-          </div>
-          <div className="flex items-center">
-            <input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-            <label className="block ml-2 text-sm text-gray-900">Make this module public immediately</label>
-          </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Gradient Header */}
+      <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 text-white pt-12 pb-24 px-4 sm:px-6 lg:px-8 shadow-inner">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 className="text-4xl font-extrabold text-white">Create New Module</h1>
+          <p className="mt-2 text-lg text-indigo-100">Build a new learning module by adding a title, description, and slides.</p>
         </div>
+      </div>
 
-        <hr className="mb-8" />
-
-        {/* Dynamic Slides Section */}
-        <div className="mb-6 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-800">Slides</h2>
-          <button type="button" onClick={addSlide} className="px-3 py-1 text-sm text-blue-600 bg-blue-100 rounded hover:bg-blue-200">
-            + Add Slide
-          </button>
-        </div>
-
-        <div className="space-y-6">
-          {slides.map((slide, index) => (
-            <div key={index} className="p-4 bg-gray-50 border border-gray-200 rounded-lg relative">
-              {slides.length > 1 && (
-                <button type="button" onClick={() => removeSlide(index)} className="absolute top-4 right-4 text-red-500 hover:text-red-700">
-                  Delete
-                </button>
-              )}
-              <h3 className="mb-4 text-sm font-semibold text-gray-500 uppercase">Slide {index + 1}</h3>
-              
-              <div className="space-y-4">
-                <input type="text" placeholder="Slide Title" required value={slide.title}
-                  onChange={(e) => handleSlideChange(index, 'title', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md" />
-                
-                <textarea placeholder="Slide Content..." required value={slide.content} rows="4"
-                  onChange={(e) => handleSlideChange(index, 'content', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md" />
-
-                {/* NEW: Upload UI is now inside the Slide! */}
-                <div className="p-4 mt-2 bg-white border border-gray-200 rounded-md">
-                  <label className="block mb-2 text-sm font-medium text-gray-700">Slide Image (Optional)</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => uploadFileHandler(e, index)} // Pass the index here!
-                    disabled={uploadingIndex === index}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  />
-                  {uploadingIndex === index && <p className="mt-2 text-sm text-blue-600">Uploading to cloud...</p>}
-                  
-                  {slide.image && (
-                    <div className="mt-4">
-                      <p className="mb-2 text-sm text-gray-500">Preview:</p>
-                      <img src={slide.image} alt={`Slide ${index + 1} preview`} className="w-full max-w-sm rounded-lg shadow-sm" />
-                    </div>
-                  )}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Module Metadata Card */}
+          <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-lg">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 border-b pb-4">Module Details</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="md:col-span-2">
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Module Title</label>
+                <input 
+                  type="text" 
+                  id="title"
+                  required 
+                  value={title} 
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="w-full px-4 py-2 text-gray-800 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                  placeholder="e.g., Introduction to React"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea 
+                  id="description"
+                  rows="4"
+                  value={description} 
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="w-full px-4 py-2 text-gray-800 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                  placeholder="A brief summary of what this module covers."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Visibility</label>
+                <div className="flex items-center space-x-4 bg-gray-50 border border-gray-200 rounded-xl p-2">
+                  <button type="button" onClick={() => setIsPublic(true)} className={`flex-1 text-center px-4 py-2 rounded-lg text-sm font-semibold transition-all ${isPublic ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'}`}>
+                    Public
+                  </button>
+                  <button type="button" onClick={() => setIsPublic(false)} className={`flex-1 text-center px-4 py-2 rounded-lg text-sm font-semibold transition-all ${!isPublic ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'}`}>
+                    Draft
+                  </button>
                 </div>
-
               </div>
             </div>
-          ))}
-        </div>
+          </div>
 
-        <button type="submit" className="w-full px-4 py-3 mt-8 text-white bg-green-600 rounded-md hover:bg-green-700">
-          Publish Module
-        </button>
-      </form>
+          {/* Slides Editor Card */}
+          <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-lg">
+            <div className="flex items-center justify-between border-b pb-4 mb-6">
+              <h2 className="text-xl font-bold text-gray-800">Slides</h2>
+              <button 
+                type="button" 
+                onClick={addSlide} 
+                className="flex items-center px-4 py-2 bg-indigo-50 text-indigo-600 font-semibold rounded-xl hover:bg-indigo-100 transition-all text-sm"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                Add Slide
+              </button>
+            </div>
+            
+            <div className="space-y-8">
+              {slides.map((slide, index) => (
+                <div key={index} className="p-6 bg-gray-50/80 rounded-xl border border-gray-200 relative">
+                  <span className="absolute -top-3 -left-3 w-8 h-8 bg-indigo-600 text-white text-sm font-bold flex items-center justify-center rounded-full shadow-md">{index + 1}</span>
+                  <button 
+                    type="button" 
+                    onClick={() => removeSlide(index)}
+                    className="absolute -top-3 -right-3 w-8 h-8 bg-rose-500 text-white flex items-center justify-center rounded-full shadow-md hover:bg-rose-600 transition-all"
+                    title="Remove Slide"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Slide Title</label>
+                      <input type="text" placeholder="Slide Title" value={slide.title} onChange={(e) => handleSlideChange(index, 'title', e.target.value)}
+                        className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                      <textarea placeholder="Slide Content" rows="5" value={slide.content} onChange={(e) => handleSlideChange(index, 'content', e.target.value)}
+                        className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Slide Image (Optional)</label>
+                      <div className="flex items-center space-x-4">
+                        <input type="text" placeholder="Image URL will appear here" readOnly value={slide.image}
+                          className="flex-grow px-4 py-2 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all" />
+                        <input type="file" id={`image-upload-${index}`} onChange={(e) => uploadFileHandler(e, index)} className="hidden" />
+                        <label htmlFor={`image-upload-${index}`} className="cursor-pointer px-4 py-2 bg-white text-gray-600 font-semibold rounded-xl border border-gray-200 hover:bg-gray-100 transition-all">
+                          {uploadingIndex === index ? (
+                            <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                          ) : 'Upload'}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Form Submission */}
+          <div className="flex justify-end pt-6">
+            <button 
+              type="submit"
+              className="flex items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 shadow-sm hover:shadow-lg transition-all transform hover:-translate-y-0.5"
+            >
+              Create Module
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

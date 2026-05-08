@@ -203,3 +203,21 @@ export const getBookmarks = asyncHandler(async (req, res) => {
 
   res.status(200).json(user.bookmarkedModules);
 });
+
+// @desc    Get user by ID
+// @route   GET /api/users/:id
+// @access  Private
+export const getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};

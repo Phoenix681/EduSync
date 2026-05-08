@@ -12,10 +12,9 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      // Hit the public backend route we just made
       await axios.post('/api/users/forgotpassword', { email });
       toast.success('Reset link sent! Check your email.');
-      setEmail(''); // Clear the input
+      setEmail('');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to send reset link');
     } finally {
@@ -24,40 +23,43 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[70vh]">
-      <div className="w-full max-w-md p-8 bg-white border border-gray-200 rounded-lg shadow-sm">
-        <h2 className="mb-6 text-2xl font-bold text-center text-gray-800">Reset Password</h2>
-        <p className="mb-6 text-sm text-gray-600 text-center">
-          Enter your email address and we'll send you a link to reset your password.
-        </p>
+    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 p-4 sm:p-6 lg:p-8">
+      <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 text-white pt-12 pb-24 px-4 sm:px-6 lg:px-8 shadow-inner"></div>
+      
+      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl shadow-2xl z-10">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-gray-900">Forgot Your Password?</h1>
+          <p className="mt-2 text-gray-600">No problem. Enter your email and we'll send a reset link.</p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email Address</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
             <input 
               type="email" 
               required 
               value={email} 
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md focus:ring-blue-500" 
-              placeholder="Enter your registered email"
+              className="w-full px-4 py-2 text-gray-800 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              placeholder="you@example.com"
             />
           </div>
 
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-blue-300"
+            className="w-full flex justify-center items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 disabled:bg-indigo-400 disabled:cursor-not-allowed"
           >
             {loading ? 'Sending...' : 'Send Reset Link'}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <Link to="/login" className="text-sm font-medium text-blue-600 hover:underline">
+        <p className="mt-6 text-sm text-center text-gray-600">
+          Remembered your password?{' '}
+          <Link to="/login" className="font-medium text-indigo-600 cursor-pointer hover:underline">
             Back to Login
           </Link>
-        </div>
+        </p>
       </div>
     </div>
   );
