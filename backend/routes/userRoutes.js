@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, loginUser, getMe, getContacts, forgotPassword, resetPassword } from '../controllers/userController.js';
+import { registerUser, loginUser, getMe, getContacts, forgotPassword, resetPassword, toggleBookmark, getBookmarks } from '../controllers/userController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -11,5 +11,8 @@ router.get('/contacts', protect, getContacts);
 
 router.post('/forgotpassword', forgotPassword);
 router.put('/resetpassword/:resetToken', resetPassword);
+
+router.put('/bookmarks/:moduleId', protect, toggleBookmark);
+router.get('/bookmarks', protect, getBookmarks);
 
 export default router;

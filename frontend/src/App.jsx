@@ -15,6 +15,7 @@ import MyModules from './pages/MyModules';
 import EditModule from './pages/EditModule';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import Bookmarks from './pages/Bookmarks';
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
             <Route path="/edit-module/:id" element={<EditModule />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route path="/bookmarks" element={<Bookmarks />} />
           </Routes>
         </main>
       </div>

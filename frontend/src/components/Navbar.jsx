@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 const Navbar = () => {
-  const { user, logout } = useAuth(); // 1. Pull user state and logout function
+  const { user, logout, unreadCount } = useAuth(); // 1. Pull user state and logout function
   const navigate = useNavigate();
 
   // 2. Handle the logout click
@@ -26,8 +26,13 @@ const Navbar = () => {
           {user ? (
             <>
               {/* NEW: Navigation Links */}
-              <li>
+              <li className='relative'>
                 <Link to="/inbox" className="text-gray-600 hover:text-blue-600">Messages</Link>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-2 -right-3 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
               </li>
               
               {/* Only show 'Create Module' if the user is an Educator */}
@@ -38,6 +43,12 @@ const Navbar = () => {
                   </Link>
                 </li>
               )}
+
+              <li>
+                <Link to="/bookmarks" className="text-gray-600 hover:text-blue-600">
+                  Saved Modules
+                </Link>
+              </li>
 
               {/* Existing Profile & Logout */}
               <li className="hidden md:block text-sm font-medium text-gray-700 ml-4 border-l pl-4">

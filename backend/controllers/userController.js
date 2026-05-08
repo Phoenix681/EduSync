@@ -162,3 +162,44 @@ export const resetPassword = asyncHandler(async (req, res) => {
     message: 'Password reset successfully',
   });
 });
+
+// @desc    Toggle bookmark a module
+// @route   PUT /api/users/bookmarks/:moduleId
+// @access  Private
+export const toggleBookmark = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const moduleId = req.params.moduleId;
+
+  // Check if the module is already in the array
+  const isBookmarked = user.bookmarkedModules.includes(moduleId);
+
+  if (isBookmarked) {
+    // If it's there, pull (remove) it
+    user.bookmarkedModules.pull(moduleId);
+  } else {
+    // If it's not there, push (add) it
+    user.bookmarkedModules.push(moduleId);
+  }
+
+  await user.save();
+
+  // Return the updated array so the frontend can immediately update the UI
+  res.status(200).json(user.bookmarkedModules);
+});
+
+// @desc    Get user's bookmarked modules
+// @route   GET /api/users/bookmarks
+// @access  Private
+export const getBookmarks = asyncHandler(async (req, res) => {
+  // Find the user, and "populate" the bookmarkedModules array with the actual module data
+  const user = await User.findById(req.user._id).populate({
+    path: 'bookmarkedModules',
+  });
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  res.status(200).json(user.bookmarkedModules);
+});

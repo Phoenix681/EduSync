@@ -26,6 +26,12 @@ const userSchema = new mongoose.Schema(
     },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
+    bookmarkedModules: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Module', // Tells Mongoose this ID links to the Module collection
+      }
+    ],
     role: {
       type: String,
       enum: ['Student', 'Educator'],

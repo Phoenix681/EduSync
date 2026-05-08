@@ -10,32 +10,55 @@ export const AuthProvider = ({ children }) => {
     return storedUser ? JSON.parse(storedUser) : null;
   });
   const [loading] = useState(false);
+  
+  // NEW: State to track unread messages for the Navbar badge
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const logout = () => {
     localStorage.removeItem('user');
     setUser(null);
+    setUnreadCount(0); // Clear the badge when they log out
   };
 
-  // Check if a user is already logged in when the app loads
+  // ==========================================
+  // EFFECT 1: Security & Token Expiration
+  // ==========================================
   useEffect(() => {
     const interceptor = axios.interceptors.response.use(
-      (response) => response, // If the request is successful, just return it
+      (response) => response, 
       (error) => {
-        // If the backend says "401 Unauthorized" (Token expired or invalid)
         if (error.response && error.response.status === 401) {
-          logout(); // 1. Clear the dead token
-          toast.error('Session expired. Please log in again.'); // 2. Notify the user
-          window.location.href = '/login'; // 3. Force them to the login screen
+          logout(); 
+          toast.error('Session expired. Please log in again.'); 
+          window.location.href = '/login'; 
         }
         return Promise.reject(error);
       }
     );
 
-    // Cleanup function to remove the interceptor if the component unmounts
     return () => {
       axios.interceptors.response.eject(interceptor);
     };
-  }, []);
+  }, []); // Empty array = only runs once on app load
+
+  // ==========================================
+  // EFFECT 2: Fetch Unread Message Count
+  // ==========================================
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      if (!user || !user.token) return; // Don't fetch if not logged in
+      
+      try {
+        const config = { headers: { Authorization: `Bearer ${user.token}` } };
+        const { data } = await axios.get('/api/messages/unread-count', config);
+        setUnreadCount(data.count);
+      } catch{
+        console.error("Failed to fetch unread count");
+      }
+    };
+
+    fetchUnreadCount();
+  }, [user]); // This runs whenever the 'user' state changes (e.g., successful login)
 
   // Register Function
   const register = async (userData) => {
@@ -66,7 +89,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, register, login, logout }}>
+    // NEW: Don't forget to expose unreadCount and setUnreadCount here!
+    <AuthContext.Provider value={{ user, setUser, register, login, logout, unreadCount, setUnreadCount }}>
       {!loading && children}
     </AuthContext.Provider>
   );

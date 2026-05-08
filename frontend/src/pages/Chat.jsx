@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import io from 'socket.io-client';
 import axios from 'axios';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth'; // Note: Ensure this path matches your project structure
 import toast from 'react-hot-toast';
 
 // 1. Initialize the socket variable outside the component so it doesn't reconnect on every re-render
@@ -10,7 +10,9 @@ let socket;
 
 const Chat = () => {
   const { targetUserId } = useParams(); // The ID of the person we are chatting with
-  const { user } = useAuth();
+  
+  // NEW: Grab setUnreadCount from context so we can clear the badge!
+  const { user, setUnreadCount } = useAuth();
   const navigate = useNavigate();
 
   const [messages, setMessages] = useState([]);
@@ -33,6 +35,23 @@ const Chat = () => {
     socket = io('http://localhost:5000');
     socket.emit('join_chat', roomID);
 
+    // ==========================================
+    // NEW: Mark Messages as Read Function
+    // ==========================================
+    const markAsRead = async () => {
+      try {
+        const config = { headers: { Authorization: `Bearer ${user.token}` } };
+        // Tell backend to mark these specific messages as read
+        await axios.put(`/api/messages/mark-read/${targetUserId}`, {}, config);
+        
+        // Re-fetch the global unread count so the Navbar updates instantly
+        const { data } = await axios.get('/api/messages/unread-count', config);
+        setUnreadCount(data.count);
+      } catch {
+        console.error("Failed to mark messages as read");
+      }
+    };
+
     // 4. Fetch the chat history from MongoDB
     const fetchHistory = async () => {
       try {
@@ -43,10 +62,14 @@ const Chat = () => {
         toast.error('Could not load chat history');
       }
     };
+
+    // Execute both fetches when the component loads
     fetchHistory();
+    markAsRead(); // Fire the new function here!
 
     // 5. Listen for incoming live messages from the other person
     socket.on('receive_message', (data) => {
+      setUnreadCount(prev => prev+1);
       setMessages((prev) => [...prev, data.dbPayload]);
     });
 
@@ -54,7 +77,7 @@ const Chat = () => {
     return () => {
       socket.disconnect();
     };
-  }, [targetUserId, user, navigate, room]);
+  }, [targetUserId, user, navigate, room, setUnreadCount]); // Added setUnreadCount to dependencies
 
   // Auto-scroll to the newest message whenever the messages array updates
   useEffect(() => {
