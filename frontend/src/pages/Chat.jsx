@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import io from 'socket.io-client';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
 
 // 1. Initialize the socket variable outside the component so it doesn't reconnect on every re-render
@@ -15,7 +15,9 @@ const Chat = () => {
 
   const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
-  const [room, setRoom] = useState('');
+  const [room] = useState(() => {
+    return [user._id, targetUserId].sort().join('_');
+  });
   const messagesEndRef = useRef(null); // Used to auto-scroll to the bottom
 
   useEffect(() => {
@@ -25,8 +27,7 @@ const Chat = () => {
     }
 
     // 2. Create a unique, consistent room ID for these two specific users
-    const roomID = [user._id, targetUserId].sort().join('_');
-    setRoom(roomID);
+    const roomID = room;
 
     // 3. Connect to the backend Socket server
     socket = io('http://localhost:5000');
@@ -53,7 +54,7 @@ const Chat = () => {
     return () => {
       socket.disconnect();
     };
-  }, [targetUserId, user, navigate]);
+  }, [targetUserId, user, navigate, room]);
 
   // Auto-scroll to the newest message whenever the messages array updates
   useEffect(() => {

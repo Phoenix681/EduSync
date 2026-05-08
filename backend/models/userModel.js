@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 const userSchema = new mongoose.Schema(
   {
@@ -23,6 +24,8 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
       select: false,
     },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
     role: {
       type: String,
       enum: ['Student', 'Educator'],
@@ -34,14 +37,13 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.pre('save',async function(next){
+userSchema.pre('save', async function () {
+  if (!this.isModified('password')) {
+    return;
+  }
 
-    if(!this.isModified('password')){
-      next();
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 userSchema.methods.matchPassword = async function (enteredPassword) {

@@ -13,6 +13,8 @@ import Inbox from './pages/Inbox';
 import CreateModule from './pages/CreateModule';
 import MyModules from './pages/MyModules';
 import EditModule from './pages/EditModule';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -28,7 +30,6 @@ function App() {
             {/* The root URL '/' will show the Dashboard */}
             <Route path="/" element={<Dashboard />} />
             
-            {/* Auth Routes */}
             <Route path="/module/:id" element={<ViewModule />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -37,6 +38,8 @@ function App() {
             <Route path="/create-module" element={<CreateModule />} />
             <Route path="/my-modules" element={<MyModules />} />
             <Route path="/edit-module/:id" element={<EditModule />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
           </Routes>
         </main>
       </div>

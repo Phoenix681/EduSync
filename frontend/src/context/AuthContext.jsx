@@ -1,21 +1,40 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
-// 1. Create the Context
-const AuthContext = createContext();
+import toast from 'react-hot-toast';
+import { AuthContext } from './authContext';
 
 // 2. Create the Provider Component
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+  const [loading] = useState(false);
+
+  const logout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+  };
 
   // Check if a user is already logged in when the app loads
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    const interceptor = axios.interceptors.response.use(
+      (response) => response, // If the request is successful, just return it
+      (error) => {
+        // If the backend says "401 Unauthorized" (Token expired or invalid)
+        if (error.response && error.response.status === 401) {
+          logout(); // 1. Clear the dead token
+          toast.error('Session expired. Please log in again.'); // 2. Notify the user
+          window.location.href = '/login'; // 3. Force them to the login screen
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    // Cleanup function to remove the interceptor if the component unmounts
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
   }, []);
 
   // Register Function
@@ -46,20 +65,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout Function
-  const logout = () => {
-    localStorage.removeItem('user');
-    setUser(null);
-  };
-
   return (
     <AuthContext.Provider value={{ user, register, login, logout }}>
       {!loading && children}
     </AuthContext.Provider>
   );
-};
-
-// 3. Create a custom hook to make using this context incredibly easy
-export const useAuth = () => {
-  return useContext(AuthContext);
 };

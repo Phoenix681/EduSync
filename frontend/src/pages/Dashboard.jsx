@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { useAuth } from '../hooks/useAuth';
 
 const Dashboard = () => {
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  const { user } = useAuth(); // 1. Grab the logged-in user from Context
+  const { user } = useAuth();
   const navigate = useNavigate();
+  
+  // NEW: Search and Sort State
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('newest'); // default sort
 
   useEffect(() => {
-    // 2. Protect the route: If no user is found, redirect to login immediately
     if (!user) {
       navigate('/login');
       return;
@@ -20,76 +22,104 @@ const Dashboard = () => {
 
     const fetchModules = async () => {
       try {
-        // 3. Attach the JWT token to the Axios request headers
         const config = {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         };
-
+        // Assuming this endpoint returns all public, non-deleted modules
         const response = await axios.get('/api/modules', config);
         setModules(response.data);
-        setLoading(false);
-      } catch {
-        setError('Failed to load modules from the server.');
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to load modules');
+      } finally {
         setLoading(false);
       }
     };
 
     fetchModules();
-  }, [user, navigate]); // Re-run this effect if the user changes
+  }, [user, navigate]);
 
-  // Display a loading message while we wait for the Node backend
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <p className="text-xl text-gray-500">Loading your modules...</p>
-      </div>
-    );
-  }
+  // ==========================================
+  // NEW: THE FILTER & SORT LOGIC
+  // ==========================================
+  const processedModules = modules
+    .filter((mod) => {
+      // 1. Search Logic: Check if the search term exists in the title OR description
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        mod.title.toLowerCase().includes(searchLower) ||
+        mod.description.toLowerCase().includes(searchLower)
+      );
+    })
+    .sort((a, b) => {
+      // 2. Sort Logic: Reorder the array based on the dropdown selection
+      if (sortBy === 'newest') return new Date(b.createdAt) - new Date(a.createdAt);
+      if (sortBy === 'oldest') return new Date(a.createdAt) - new Date(b.createdAt);
+      if (sortBy === 'a-z') return a.title.localeCompare(b.title);
+      return 0;
+    });
+
+  if (loading) return <div className="mt-20 text-center text-gray-500">Loading modules...</div>;
 
   return (
-    <div className="p-4 md:p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">My Dashboard</h1>
-        <p className="mt-2 text-gray-600">
-          Welcome back, <span className="font-semibold text-blue-600">{user.name}</span>! Here are the available study modules.
-        </p>
+    <div className="max-w-6xl mx-auto mt-8 px-4">
+      <div className="flex flex-col md:flex-row items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Explore Modules</h1>
+        
+        {/* NEW: Search & Sort Controls UI */}
+        <div className="flex flex-col sm:flex-row w-full md:w-auto gap-4">
+          <input
+            type="text"
+            placeholder="Search by title or topic..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          />
+          
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="w-full sm:w-40 px-4 py-2 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
+          >
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="a-z">Title (A-Z)</option>
+          </select>
+        </div>
       </div>
 
-      {error && (
-        <div className="p-4 mb-6 text-red-700 bg-red-100 rounded-md">
-          {error}
-        </div>
-      )}
-
-      {/* 4. Display the grid of modules */}
-      {modules.length === 0 ? (
-        <div className="p-8 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
-          <p className="text-gray-500">No modules are available right now. Check back later!</p>
+      {processedModules.length === 0 ? (
+        <div className="p-12 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+          <p className="text-gray-500 text-lg">No modules found matching your search.</p>
+          <button 
+            onClick={() => setSearchTerm('')} 
+            className="mt-4 text-blue-600 hover:underline"
+          >
+            Clear Search
+          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {modules.map((module) => (
-            <div 
-              key={module._id} 
-              className="flex flex-col justify-between p-6 bg-white border border-gray-100 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-            >
-              <div>
-                <h2 className="mb-2 text-xl font-bold text-gray-800">{module.title}</h2>
-                <p className="mb-4 text-sm text-gray-500">
-                  By: {module.educator?.name || 'Unknown Educator'}
-                </p>
-                <p className="mb-4 text-gray-600 line-clamp-3">
-                  {module.description}
-                </p>
+          {/* NOTICE: We map over 'processedModules' now, not 'modules' */}
+          {processedModules.map((module) => (
+            <div key={module._id} className="p-6 transition-shadow bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md flex flex-col h-full">
+              <div className="grow">
+                <h2 className="text-xl font-bold text-gray-800">{module.title}</h2>
+                <p className="mt-2 text-sm text-gray-600 line-clamp-3">{module.description}</p>
               </div>
-              <Link 
-                to={`/module/${module._id}`}
-                className="block w-full px-4 py-2 mt-4 text-sm font-medium text-center text-blue-600 transition-colors border border-blue-600 rounded-md hover:bg-blue-50"
-              >
-                View Module
-              </Link>
+              
+              <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
+                <span className="text-xs font-medium text-gray-500 uppercase">
+                  {module.slides?.length || 0} Slides
+                </span>
+                <Link 
+                  to={`/module/${module._id}`}
+                  className="px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700"
+                >
+                  View Module
+                </Link>
+              </div>
             </div>
           ))}
         </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
 
 const Login = () => {
@@ -57,7 +57,14 @@ const Login = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <Link to="/forgot-password"
+                className="text-sm text-blue-600 hover:underline"
+              >
+                Forgot Password?
+              </Link>
+            </div>
             <input
               type="password"
               name="password"
@@ -79,9 +86,9 @@ const Login = () => {
 
         <p className="mt-6 text-sm text-center text-gray-600">
           Don't have an account?{' '}
-          <span className="font-medium text-blue-600 cursor-pointer hover:underline">
+          <Link to="/register" className="font-medium text-blue-600 cursor-pointer hover:underline">
             Register here
-          </span>
+          </Link>
         </p>
       </div>
     </div>
