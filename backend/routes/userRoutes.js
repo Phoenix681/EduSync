@@ -8,13 +8,15 @@ router.post('/', registerUser);
 router.post('/login', loginUser);
 router.get('/me', protect, getMe);
 router.get('/contacts', protect, getContacts);
+
+
+router.get('/bookmarks', protect, getBookmarks);
+router.put('/bookmarks/:moduleId', protect, toggleBookmark);
+
 router.get('/:id', protect, getUserById);
 
 
 router.post('/forgotpassword', forgotPassword);
 router.put('/resetpassword/:resetToken', resetPassword);
-
-router.put('/bookmarks/:moduleId', protect, toggleBookmark);
-router.get('/bookmarks', protect, getBookmarks);
 
 export default router;
