@@ -80,7 +80,7 @@ const Bookmarks = () => {
     <div className="flex flex-col min-h-[calc(100vh-64px)] bg-gray-50 pb-8">
       
       {/* Gradient Header - Now matching the beautiful Indigo theme */}
-      <div className="px-4 pt-12 pb-24 text-white shadow-inner shrink-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 sm:px-6 lg:px-8">
+      <div className="px-4 pt-12 pb-24 text-white shadow-inner shrink-0 bg-linear-to-r from-indigo-600 via-purple-600 to-indigo-800 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl font-extrabold">My Bookmarks</h1>
           <p className="mt-2 text-lg text-indigo-100">The learning modules you have saved for later.</p>
@@ -106,7 +106,7 @@ const Bookmarks = () => {
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {modules.map((module) => (
               <div key={module._id} className="flex flex-col transition-all transform bg-white border border-gray-100 shadow-lg rounded-2xl hover:-translate-y-1 hover:shadow-2xl">
-                <div className="flex-grow p-6">
+                <div className="grow p-6">
                   <div className="flex items-start justify-between">
                     <span className="inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800">
                       {module.slides?.length || 0} Slides
