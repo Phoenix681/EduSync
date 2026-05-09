@@ -17,7 +17,7 @@ connectDB();
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://your-production-frontend.vercel.app'], // Add your actual frontend deployment URL here
+  origin: ['http://localhost:5173', 'edu-sync-gilt.vercel.app'], // Add your actual frontend deployment URL here
   credentials: true, // Crucial if you are sending cookies or authorization headers
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
