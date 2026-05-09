@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import io from 'socket.io-client';
-import axios from 'axios';
+import axios from '../utils/axiosInstance';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
@@ -28,7 +28,7 @@ const Chat = () => {
       return;
     }
 
-    socket = io('http://localhost:5000');
+    socket = io('https://edusync-el34.onrender.com');
     socket.emit('join_chat', room);
 
     const fetchData = async () => {

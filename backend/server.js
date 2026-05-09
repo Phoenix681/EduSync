@@ -7,12 +7,20 @@ import messageRoutes from "./routes/messageRoutes.js";
 import Message from "./models/messageModel.js";
 import uploadRoutes from './routes/uploadRoutes.js';
 
+import cors from 'cors';
+
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 
 connectDB();
 
 const app = express();
+
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://your-production-frontend.vercel.app'], // Add your actual frontend deployment URL here
+  credentials: true, // Crucial if you are sending cookies or authorization headers
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
 
 const httpServer = createServer(app);
 
