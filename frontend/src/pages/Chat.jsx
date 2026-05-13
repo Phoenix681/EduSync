@@ -17,9 +17,10 @@ const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState('');
   const [targetUser, setTargetUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isConnected, setIsConnected] = useState(false); // Track connection
+  const offlineQueue = useRef([]); // Store unsent messages
   const messagesEndRef = useRef(null);
 
-  // Safely generate the room ONLY if user exists
   const room = user ? [user._id, targetUserId].sort().join('_') : '';
 
   useEffect(() => {
@@ -29,36 +30,49 @@ const Chat = () => {
     }
 
     socket = io('https://edusync-el34.onrender.com');
-    socket.emit('join_chat', room);
 
     const fetchData = async () => {
-      setLoading(true);
       try {
         const config = { headers: { Authorization: `Bearer ${user.token}` } };
-        
         const [historyRes, targetUserRes] = await Promise.all([
           axios.get(`/api/messages/${targetUserId}`, config),
           axios.get(`/api/users/${targetUserId}`, config) 
         ]);
-
-        // IMPORTANT: Ensure historyRes.data is an array! 
-        // If your backend returns { messages: [...] }, change this to historyRes.data.messages
         setMessages(Array.isArray(historyRes.data) ? historyRes.data : []);
         setTargetUser(targetUserRes.data);
 
         await axios.put(`/api/messages/mark-read/${targetUserId}`, {}, config);
         const { data: unreadData } = await axios.get('/api/messages/unread-count', config);
         setUnreadCount(unreadData.count);
-
       } catch (error) {
-        toast.error('Could not load chat data');
-        console.error("Chat loading error:", error);
-      } finally {
-        setLoading(false);
+        console.error("Fetch error", error);
+      }finally {
+        setLoading(false); 
       }
     };
 
     fetchData();
+
+    // --- SOCKET EVENT LISTENERS ---
+    socket.on('connect', () => {
+      setIsConnected(true);
+      socket.emit('join_chat', room);
+
+      fetchData();
+      
+      // AUTO-SYNC: Send queued messages when reconnected
+      if (offlineQueue.current.length > 0) {
+        console.log(`Syncing ${offlineQueue.current.length} offline messages...`);
+        offlineQueue.current.forEach(msg => socket.emit('send_message', msg));
+        offlineQueue.current = []; // Clear queue
+        toast.success('Offline messages synced!');
+      }
+    });
+
+    socket.on('disconnect', () => {
+      setIsConnected(false);
+      toast.error('Connection lost. Messages will queue.', { id: 'conn-lost' });
+    });
 
     socket.on('receive_message', (data) => {
       setMessages((prev) => [...prev, data.dbPayload]);
@@ -84,10 +98,19 @@ const Chat = () => {
         receiver: targetUserId,
         content: currentMessage,
         createdAt: new Date().toISOString(), 
+        isOffline: !isConnected // Optional flag for UI
       },
     };
 
-    socket.emit('send_message', messageData);
+    if (isConnected) {
+      socket.emit('send_message', messageData);
+    } else {
+      // PUSH TO OFFLINE QUEUE
+      offlineQueue.current.push(messageData);
+      toast('Queued (Offline)', { icon: '⏳' });
+    }
+
+    // Always update local UI immediately
     setMessages((prev) => [...prev, messageData.dbPayload]);
     setCurrentMessage('');
   };
